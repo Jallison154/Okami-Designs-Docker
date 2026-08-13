@@ -2,18 +2,17 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Install production dependencies first (better layer caching)
 COPY package*.json ./
+RUN npm install --omit=dev
 
-# Install dependencies
-RUN npm install --production
-
-# Copy application files
+# Copy application source (see .dockerignore)
 COPY . .
 
-# Expose port
+# Runtime port — override with -e PORT=... or compose environment
+ENV PORT=3000
+ENV NODE_ENV=production
+
 EXPOSE 3000
 
-# Start server
 CMD ["npm", "start"]
-

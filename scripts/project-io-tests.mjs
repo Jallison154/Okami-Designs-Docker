@@ -4,7 +4,7 @@
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-const ProjectIO = require('../tools/led-wall-calculator/project-io.js');
+const ProjectIO = require('../../okami-led-wall-calculator/engine/project-io.js');
 
 const results = [];
 

@@ -9,7 +9,7 @@
     <title>Admin - Okami Designs</title>
     <meta name="description" content="Okami Designs Admin Panel">
     <link rel="icon" href="images/Okami_Designs_HeadWhite.png" type="image/png">
-    <link rel="stylesheet" href="styles.css?v=20260718f">
+    <link rel="stylesheet" href="styles.css?v=20260813a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -152,6 +152,35 @@
                                         <button type="button" id="save-tools-catalog" class="tools-admin-btn tools-admin-btn--save" disabled>Save Changes</button>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="tools-admin-quickadd" id="tools-quickadd-app">
+                                <div class="tools-admin-quickadd-header">
+                                    <h3 class="tools-admin-quickadd-title">Add App (Subdomain)</h3>
+                                    <p class="tools-admin-quickadd-desc">Each app runs in its own container on a subdomain, like the existing tools below. Enter a name and subdomain to add it to the Apps group — everything else (icon, description, ordering) is editable afterward from the full tool editor.</p>
+                                </div>
+                                <form class="tools-admin-quickadd-form" id="quickadd-app-form">
+                                    <div class="modal-field">
+                                        <label for="quickadd-app-title">App name</label>
+                                        <input id="quickadd-app-title" type="text" maxlength="120" required placeholder="e.g. Event Flow">
+                                    </div>
+                                    <div class="modal-field">
+                                        <label for="quickadd-app-subdomain">Subdomain</label>
+                                        <div class="tools-admin-quickadd-domain">
+                                            <span class="tools-admin-quickadd-domain-affix">https://</span>
+                                            <input id="quickadd-app-subdomain" type="text" maxlength="63" required placeholder="eventflow" pattern="[a-z0-9\-]+" autocapitalize="off" autocomplete="off" spellcheck="false">
+                                            <span class="tools-admin-quickadd-domain-affix">.okamidesigns.com</span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-field">
+                                        <label for="quickadd-app-desc">Short description (optional)</label>
+                                        <input id="quickadd-app-desc" type="text" maxlength="400" placeholder="One line for the homepage card">
+                                    </div>
+                                    <div class="modal-field modal-field--inline">
+                                        <label><input type="checkbox" id="quickadd-app-featured" checked> Show on Homepage</label>
+                                    </div>
+                                    <button type="submit" class="tools-admin-btn tools-admin-btn--primary">Add App</button>
+                                </form>
                             </div>
 
                             <div id="tools-admin-list" class="tools-admin-list" aria-live="polite" aria-labelledby="tools-admin-heading"></div>
@@ -297,11 +326,11 @@
     <script src="shared/settings/site-settings.js"></script>
     <script src="shared/registry/pages.js"></script>
     <script src="shared/visibility/access-policy.js"></script>
-    <script src="shared/tools/catalog.js"></script>
+    <script src="shared/tools/catalog.js?v=20260813a"></script>
     <script src="page-registry.js"></script>
     <script src="admin-api.js?v=20260718f"></script>
     <script src="admin.js?v=20260718f"></script>
-    <script src="admin-tools.js?v=20260718f"></script>
+    <script src="admin-tools.js?v=20260813a"></script>
     <script src="admin-tabs.js?v=20260718f"></script>
 </body>
 </html>

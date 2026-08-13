@@ -6,38 +6,6 @@
 
     const DEFAULT_SEED_TOOLS = [
         {
-            id: 'led-video-wall-calculator',
-            title: 'LED Video Wall Calculator',
-            category: 'Calculator',
-            shortDescription: 'Visual calculator for LED wall layouts, resolution, aspect ratios, and processor requirements.',
-            longDescription: '',
-            imageSource: 'placeholder',
-            iconUrl: '',
-            websiteLogoUrl: '',
-            websiteLogoRemoteUrl: '',
-            websiteLogoKind: '',
-            websiteLogoFetchedAt: '',
-            websiteLogoError: '',
-            contentType: 'calculator',
-            buttonLabel: 'Open tool →',
-            url: '/tools/led-video-wall-calculator',
-            linkType: 'internal',
-            openInNewTab: false,
-            enabled: true,
-            featured: true,
-            listOnToolsPage: true,
-            displayOrder: 1,
-            homepageOrder: 1,
-            slug: 'led-video-wall-calculator',
-            detailPageEnabled: false,
-            pageKey: 'ledVideoWallCalculator',
-            accent: 'default',
-            features: [],
-            screenshots: [],
-            supportUrl: '',
-            heroImageUrl: ''
-        },
-        {
             id: 'okami-signal-lab',
             title: 'Okami Signal Lab',
             category: 'Signal Lab',
@@ -52,49 +20,18 @@
             websiteLogoError: '',
             contentType: 'tool',
             buttonLabel: 'Open tool →',
-            url: '/tools/signal-lab',
-            linkType: 'internal',
-            openInNewTab: false,
-            enabled: true,
-            featured: true,
-            listOnToolsPage: true,
-            displayOrder: 2,
-            homepageOrder: 2,
-            slug: 'signal-lab',
-            detailPageEnabled: false,
-            pageKey: 'okamiSignalLab',
-            accent: 'default',
-            features: [],
-            screenshots: [],
-            supportUrl: '',
-            heroImageUrl: ''
-        },
-        {
-            id: 'pack',
-            title: 'PACK',
-            category: 'Personal Connections',
-            shortDescription: 'Remember the people, places, and moments that matter. PACK keeps your connections organized in one private, easy-to-use space.',
-            longDescription: '',
-            imageSource: 'website',
-            iconUrl: '/images/pack-icon.svg',
-            websiteLogoUrl: '',
-            websiteLogoRemoteUrl: '',
-            websiteLogoKind: '',
-            websiteLogoFetchedAt: '',
-            websiteLogoError: '',
-            contentType: 'app',
-            buttonLabel: 'Open PACK',
-            url: 'https://pack.okamidesigns.com',
+            url: 'https://signallab.okamidesigns.com/',
             linkType: 'external',
             openInNewTab: false,
             enabled: true,
-            featured: true,
+            featured: false,
             listOnToolsPage: true,
-            displayOrder: 3,
-            homepageOrder: 3,
-            slug: 'pack',
+            displayOrder: 1,
+            homepageOrder: 999,
+            slug: 'signal-lab',
             detailPageEnabled: false,
-            pageKey: null,
+            pageKey: 'okamiSignalLab',
+            navGroup: 'avTools',
             accent: 'default',
             features: [],
             screenshots: [],
@@ -120,13 +57,14 @@
             linkType: 'internal',
             openInNewTab: false,
             enabled: true,
-            featured: true,
+            featured: false,
             listOnToolsPage: false,
-            displayOrder: 4,
-            homepageOrder: 4,
+            displayOrder: 2,
+            homepageOrder: 999,
             slug: '3d-prints',
             detailPageEnabled: false,
             pageKey: 'prints',
+            navGroup: null,
             accent: 'default',
             features: [],
             screenshots: [],
@@ -217,6 +155,18 @@
         return 'default';
     }
 
+    /**
+     * Which group (if any) a tool appears under in the Tools nav dropdown.
+     * null = not shown in the nav dropdown (still eligible for homepage / Tools hub).
+     */
+    function normalizeNavGroup(value) {
+        const raw = asString(value).trim();
+        if (raw === 'apps' || raw === 'avTools') {
+            return raw;
+        }
+        return null;
+    }
+
     function normalizeImageSource(raw, linkType, url) {
         const value = asString(raw?.imageSource).toLowerCase();
         if (value === 'upload' || value === 'website' || value === 'placeholder') {
@@ -296,6 +246,7 @@
             slug,
             detailPageEnabled: asBoolean(raw?.detailPageEnabled, false),
             pageKey: asString(raw?.pageKey).trim() || null,
+            navGroup: normalizeNavGroup(raw?.navGroup),
             accent: normalizeAccent(raw?.accent),
             features: asStringArray(raw?.features),
             screenshots: asStringArray(raw?.screenshots),
@@ -386,19 +337,6 @@
         const byId = new Map(tools.map((tool) => [tool.id, tool]));
         const next = [...tools];
 
-        // Soft migration helpers for PACK only — never resurrect deleted entries.
-        if (byId.has('pack')) {
-            const pack = byId.get('pack');
-            pack.imageSource = pack.imageSource || 'website';
-            pack.category = pack.category || 'Personal Connections';
-            pack.url = pack.url || 'https://pack.okamidesigns.com';
-            pack.buttonLabel = pack.buttonLabel || 'Open PACK';
-            pack.contentType = pack.contentType || 'app';
-            if (pack.listOnToolsPage == null) {
-                pack.listOnToolsPage = true;
-            }
-        }
-
         // One-time companion seed only when explicitly requested (empty catalog recovery).
         if (options.seedMissingPrints && !byId.has('3d-prints')) {
             const seed = DEFAULT_SEED_TOOLS.find((item) => item.id === '3d-prints');
@@ -464,6 +402,18 @@
                 if (orderDiff !== 0) return orderDiff;
                 return left.title.localeCompare(right.title);
             });
+    }
+
+    /**
+     * Tools nav dropdown contents, grouped by navGroup and sorted by displayOrder.
+     * Single source of truth so new apps only need a catalog entry — no code changes.
+     */
+    function getNavGroupedTools(catalog) {
+        const enabledTools = sortTools((catalog?.tools || []).filter((tool) => asBoolean(tool.enabled, true)));
+        return {
+            apps: enabledTools.filter((tool) => tool.navGroup === 'apps'),
+            avTools: enabledTools.filter((tool) => tool.navGroup === 'avTools')
+        };
     }
 
     function reindexHomepageOrder(tools) {
@@ -545,6 +495,7 @@
         getPublicTools,
         getToolsPageTools,
         getHomepageProjects,
+        getNavGroupedTools,
         reindexHomepageOrder,
         getToolBySlug,
         getToolById,

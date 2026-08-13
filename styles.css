@@ -2153,6 +2153,36 @@ html {
     text-decoration: underline;
 }
 
+.support-community {
+    margin-top: 30px;
+    padding: 30px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.support-community-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    color: var(--primary-text);
+    margin: 0 0 10px;
+}
+
+.support-community-subtitle {
+    font-size: 15px;
+    color: var(--secondary-text);
+    margin: 0 0 24px;
+}
+
+.support-community-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
 /* Login Screen */
 .login-screen {
     position: fixed;
@@ -3630,6 +3660,86 @@ html {
     color: #fff;
 }
 
+.tools-admin-quickadd {
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    background: rgba(255, 106, 45, 0.05);
+}
+
+.tools-admin-quickadd-header {
+    margin-bottom: 14px;
+}
+
+.tools-admin-quickadd-title {
+    margin: 0 0 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-text);
+}
+
+.tools-admin-quickadd-desc {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--secondary-text);
+    max-width: 46rem;
+}
+
+.tools-admin-quickadd-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 16px;
+}
+
+.tools-admin-quickadd-form .modal-field {
+    flex: 1 1 200px;
+    gap: 6px;
+    margin-bottom: 0;
+}
+
+.tools-admin-quickadd-form .modal-field--inline {
+    flex: 0 0 auto;
+    padding-bottom: 10px;
+}
+
+.tools-admin-quickadd-domain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tools-admin-quickadd-domain-affix {
+    font-size: 0.82rem;
+    color: var(--secondary-text);
+    white-space: nowrap;
+}
+
+.tools-admin-quickadd-domain input {
+    flex: 1;
+    min-width: 80px;
+    padding: 12px 0;
+    border: none;
+    background: transparent;
+    color: var(--primary-text);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.tools-admin-quickadd-domain input:focus {
+    outline: none;
+}
+
+.tools-admin-quickadd-form button[type="submit"] {
+    flex: 0 0 auto;
+}
+
 .tools-admin-list {
     margin: 0;
 }
@@ -4395,6 +4505,49 @@ body.tools-drawer-open {
     letter-spacing: 0.5px !important;
 }
 
+/* Tools nav dropdown groups (Apps / AV Tools) */
+.nav-dropdown-group {
+    display: block;
+}
+
+.nav-dropdown-group + .nav-dropdown-group {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.nav-dropdown-group-label {
+    display: block;
+    padding: 6px 12px 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted-text, var(--secondary-text));
+    opacity: 0.7;
+}
+
+.nav-mobile-subgroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-mobile-subgroup + .nav-mobile-subgroup {
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.nav-mobile-subgroup-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--secondary-text);
+    opacity: 0.7;
+}
+
 /* LED Video Wall Calculator */
 .led-calculator-page {
     --calculator-sidebar-width: minmax(300px, 360px);
@@ -4703,73 +4856,6 @@ body.tools-drawer-open {
     font-size: 13px;
 }
 
-.hero-flagship {
-    width: 100%;
-    max-width: 520px;
-    margin: 4px auto 0;
-}
-
-.hero-flagship-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 14px 18px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 106, 45, 0.28);
-    background: linear-gradient(135deg, rgba(255, 106, 45, 0.1) 0%, rgba(22, 22, 22, 0.85) 55%);
-    backdrop-filter: blur(10px);
-}
-
-.hero-flagship-eyebrow {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--accent-color);
-}
-
-.hero-flagship-title {
-    margin: 0;
-    font-family: 'Montserrat', sans-serif;
-    font-size: clamp(1rem, 2vw, 1.15rem);
-    font-weight: 800;
-    color: var(--primary-text);
-    line-height: 1.25;
-}
-
-.hero-flagship-meta {
-    margin: 0;
-    font-size: 0.78rem;
-    color: var(--secondary-text);
-    letter-spacing: 0.2px;
-}
-
-.hero-flagship-btn {
-    display: inline-block;
-    margin-top: 4px;
-    padding: 8px 16px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.55px;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: var(--primary-bg);
-    background: var(--gradient-primary);
-    border: none;
-    border-radius: 5px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    font-family: 'Montserrat', sans-serif;
-    cursor: pointer;
-}
-
-.hero-flagship-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(255, 106, 45, 0.35);
-    color: var(--primary-bg);
-    text-decoration: none;
-}
-
 .cta-button-secondary {
     background: transparent;
     color: var(--accent-color);
@@ -4965,10 +5051,6 @@ body.tools-drawer-open {
         width: 100%;
         text-align: center;
     }
-
-    .hero-flagship {
-        max-width: 100%;
-    }
 }
 
 .calculator-layout {
@@ -5137,8 +5219,8 @@ body.tools-drawer-open {
 
 .led-config-footer-actions .led-btn {
     width: 100%;
-    min-height: 36px;
-    padding: 8px 10px;
+    min-height: 44px;
+    padding: 10px;
     font-size: 0.8rem;
 }
 
@@ -6187,6 +6269,7 @@ body.tools-drawer-open {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    padding: 10px 0;
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--secondary-text);

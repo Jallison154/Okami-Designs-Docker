@@ -8,7 +8,7 @@ import vm from 'vm';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const calcDir = path.join(__dirname, '..', 'tools', 'led-wall-calculator');
+const calcDir = path.join(__dirname, '..', '..', 'okami-led-wall-calculator', 'engine');
 
 function loadCalculator() {
     const ctx = { OkamiLedWallCalculator: {} };

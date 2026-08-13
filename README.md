@@ -1,169 +1,97 @@
 # Okami Designs Website
 
-A modern, responsive website for Okami Designs with AV tools (Signal Lab, LED Video Wall Calculator), admin panel, and API backend.
+Public site and API for [okamidesigns.com](https://okamidesigns.com) — AV / event-production tools, a tools catalog, 3D prints, and an admin panel.
 
-**Developer docs:** [Contributing](docs/CONTRIBUTING.md) · [Script load order](docs/SCRIPT-LOAD-ORDER.md) · [Admin login setup](docs/ADMIN-LOGIN-SETUP.md) · [Commercial architecture](ARCHITECTURE-COMMERCIAL.md)
+**Live surfaces:** home, services, support, contact, Tools hub, LED Video Wall Calculator, Okami Signal Lab, 3D prints (Cults3D), password-protected admin + analytics.
 
-## Current Status
+**Developer docs:** [Contributing](docs/CONTRIBUTING.md) · [Adding a tool](docs/ADDING-A-TOOL.md) · [Script load order](docs/SCRIPT-LOAD-ORDER.md) · [Admin login](docs/ADMIN-LOGIN-SETUP.md) · [Commercial architecture](ARCHITECTURE-COMMERCIAL.md)
 
-**Website is under construction** - Displaying a beautiful splash page with the Okami Designs logo.
+## Stack
 
-## Features
+| Layer | Choice |
+|--------|--------|
+| Runtime | Node.js 18+ (Express) |
+| Frontend | Multi-page HTML + vanilla JS |
+| Styles | `styles.css` (dark grey + orange, Montserrat) |
+| Data | JSON under `files/` (no database) |
+| Deploy | Docker image for the API; optional Nginx; Cloudflare Tunnel friendly |
 
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
-- **Modern Typography**: Uses Orbitron (headings) and JetBrains Mono (monospace) fonts
-- **Smooth Animations**: Floating logo, fade-in effects, and shimmer animations
-- **Brand Colors**: Consistent use of Okami Design color palette
-- **SEO Optimized**: Proper meta tags and semantic HTML structure
-- **Performance Optimized**: Minimal assets and efficient loading
-- **Docker Ready**: Easy deployment with Docker Compose
-- **Cloudflare Compatible**: Works with Cloudflare proxy and SSL
+## Quick start (local)
 
-## Quick Start with Docker
-
-### Automated Installation
-1. **Run the installation script**:
-   ```bash
-   chmod +x install-okami-designs-github.sh
-   sudo ./install-okami-designs-github.sh
-   ```
-
-### Manual Installation
-1. **Clone or download the files** to your server
-2. **Run with Docker Compose**:
-   ```bash
-   docker-compose up -d
-   ```
-3. **Access your website** at `http://your-server-ip` or `https://okamidesigns.com`
-
-## Manual Nginx Setup
-
-1. **Install Nginx** on your Proxmox VM/LXC:
-   ```bash
-   sudo apt update
-   sudo apt install nginx
-   ```
-
-2. **Create website directory**:
-   ```bash
-   sudo mkdir -p /var/www/okami-designs
-   ```
-
-3. **Copy files**:
-   ```bash
-   sudo cp -r . /var/www/okami-designs/
-   sudo chown -R www-data:www-data /var/www/okami-designs
-   ```
-
-4. **Configure Nginx**:
-   ```bash
-   sudo cp nginx.conf /etc/nginx/sites-available/okami-designs
-   sudo ln -s /etc/nginx/sites-available/okami-designs /etc/nginx/sites-enabled/
-   sudo nginx -t
-   sudo systemctl reload nginx
-   ```
-
-## File Structure
-
-```
-okami-designs/
-├── index.html                    # Main splash page HTML
-├── index-full-website.html      # Full website (disabled, for future use)
-├── Splash/                       # Splash page assets
-│   ├── HTML.txt                 # Splash page template
-│   └── Okami_Designs_FullW.png  # Logo image
-├── styles.css                    # CSS styles (not used by splash page)
-├── script.js                     # JavaScript (not used by splash page)
-├── nginx.conf                    # Nginx configuration
-├── docker-compose.yml            # Docker setup
-├── install-okami-designs.sh     # Local installation script
-├── install-okami-designs-github.sh # GitHub installation script
-├── PROXMOX_INSTALLATION_GUIDE.md # Proxmox setup guide
-└── README.md                     # This file
-```
-
-## Adding Images
-
-Create an `images` folder and add your ceramic vase photos:
-
-- **vase-1.jpg**: Square format, single round vase (400x400px recommended)
-- **vase-2.jpg**: Vertical format, hands holding tall vase (300x400px recommended)
-- **vase-3.jpg**: Horizontal format, collection of vases (600x300px recommended)
-
-**Recommended formats**: WebP for better performance, JPG as fallback
-
-## Customization
-
-### Colors
-The main color scheme uses:
-- Background: `#333333` (dark grey)
-- Text: `#e6e6e6` (light grey/white)
-- Button: `#FF6A2D` (orange)
-- Button Hover: White background with orange text
-
-### Fonts
-- Headers: Orbitron (monospace, bold)
-- Status badge: JetBrains Mono (monospace)
-- Body text: Inter (sans-serif)
-
-### Layout
-The current splash page features:
-- Centered logo with floating animation
-- "Website Under Construction" message
-- "Coming Soon" status badge with shimmer effect
-- Modern dark theme with orange accents
-- Responsive and mobile-friendly
-
-## Security Considerations
-
-- Configure UDM Pro firewall rules (ports 80 and 443)
-- Set up SSL certificates (Let's Encrypt or Cloudflare SSL)
-- Use Cloudflare proxy for external access
-- Regular security updates
-- Enable Cloudflare security features
-
-## Performance Tips
-
-- Optimize images (WebP format recommended)
-- Enable gzip compression (included in nginx.conf)
-- Use Cloudflare CDN for static assets
-- Implement caching headers
-- Enable Cloudflare caching features
-
-## Support
-
-This website is designed to work with:
-- Nginx web server
-- Docker containers
-- Proxmox VMs and LXC containers
-- UDM Pro firewall
-- Cloudflare proxy
-- Modern web browsers
-
-## Installation Scripts
-
-- **`install-okami-designs-github.sh`**: Downloads from GitHub repository
-- **`install-okami-designs.sh`**: Creates website files locally
-- **`PROXMOX_INSTALLATION_GUIDE.md`**: Detailed Proxmox setup instructions
-
-## Troubleshooting
-
-### Common Issues
-1. **Website not accessible**: Check UDM Pro firewall rules
-2. **HTTPS not working**: Verify Cloudflare SSL settings
-3. **Images not loading**: Add images to `/opt/okami-designs/images/`
-4. **Container not starting**: Check Docker logs with `docker logs okami-designs-website`
-
-### Useful Commands
 ```bash
-# View website logs
-docker logs okami-designs-website
-
-# Restart website
-docker-compose restart
-
-# Check container status
-docker ps | grep okami-designs
+cp .env.example .env
+# Set ADMIN_PASSWORD_HASH (see docs/ADMIN-LOGIN-SETUP.md) and/or ADMIN_DEV_PASSWORD for local admin
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-For questions or customization help, refer to the nginx and Docker documentation.
+Production-style without nodemon: `npm start`.
+
+Useful scripts: `npm run test:gate`, `npm run test:calculations`, `npm run test:api`, `npm run generate:sitemap`.
+
+## Docker
+
+The app reads **`PORT` from the environment** (default `3000`) via `server/config/app-config.js`.
+
+```bash
+cp .env.example .env   # required — compose loads env_file: .env
+docker compose up -d --build          # API only on :3000
+docker compose --profile with-nginx up -d --build   # also start Nginx on :80/:443
+```
+
+| Service | Role |
+|---------|------|
+| `okami-designs-api` | Builds from `Dockerfile`, runs `server.js`, persists `./files` |
+| `okami-designs-web` | Optional Nginx (`profiles: [with-nginx]`) — not needed if Cloudflare Tunnel (or another proxy) targets the API container directly |
+
+### Environment
+
+See `.env.example`. Important for any deploy:
+
+- `PORT` — listen port inside the container (compose maps host → `3000`)
+- `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` — admin login
+- `OKAMI_CORS_ALLOWED_ORIGINS` — production CORS allowlist
+- Cults3D / commercial vars — optional; commercial stays off until phase gates say otherwise
+
+### Nginx note
+
+`nginx.conf` is written for the **Docker Compose** layout:
+
+- `root /var/www/okami-designs` — path inside the Nginx container (compose bind-mounts the repo there)
+- `proxy_pass http://okami-designs-api:3000` — Docker network hostname, not a host path
+
+It is **not** a bare-metal `/var/www/...` install config by itself. If you route with Cloudflare Tunnel → Node only, you can omit the Nginx service entirely (default `docker compose up` already does).
+
+## Project layout (high level)
+
+```
+server.js                 # Express entry
+server/                   # API, admin auth, tools, Cults3D, commercial
+shared/registry/pages.js  # Page + tool registry (nav, routes, visibility)
+client/                   # Browser helpers (tools hub, prints, home)
+tools/                    # Tools hub + detail shells (first-party apps are standalone repos)
+files/                    # Runtime JSON + uploads (tools.json, analytics, icons)
+docs/                     # Contributor docs
+admin.html                # Admin UI
+home.html                 # Public landing (when constructionMode is off)
+index.html                # Construction splash (when constructionMode is on)
+```
+
+Routing and Tools nav are driven by `shared/registry/pages.js`. Adding a first-party tool: see [docs/ADDING-A-TOOL.md](docs/ADDING-A-TOOL.md).
+
+## Construction mode
+
+`files/site-settings.json` controls `constructionMode`. When `true`, `/` serves the splash (`index.html`). When `false`, `/` serves `home.html`. Admins can still open the splash at `/index.html` while the site is live.
+
+## Brand / UI
+
+- Background `#333333`, text `#e6e6e6`, accent `#FF6A2D`
+- Prefer bumping `?v=` cache-busters on CSS/JS when shipping visible front-end changes
+
+## Support / ops
+
+```bash
+docker logs okami-designs-api
+docker compose ps
+docker compose restart
+```

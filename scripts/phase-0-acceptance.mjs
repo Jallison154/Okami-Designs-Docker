@@ -41,7 +41,7 @@ async function fetchOk(url, label) {
 function testLedCalculations() {
     const label = 'LED wall golden calculation (inline smoke)';
     try {
-        const calcDir = path.join(root, 'tools', 'led-wall-calculator');
+        const calcDir = path.join(root, '..', 'okami-led-wall-calculator', 'engine');
         const ctx = { OkamiLedWallCalculator: {} };
         for (const file of ['constants.js', 'calculations.js', 'metrics.js']) {
             vm.runInNewContext(fs.readFileSync(path.join(calcDir, file), 'utf8'), ctx);
@@ -86,14 +86,18 @@ function testSharedNodeModules() {
         const visibility = require(path.join(root, 'shared/visibility/access-policy.js'));
         const trackable = pages.getTrackablePages().length;
         const access = visibility.getAccessDecision({
-            pathValue: 'tools/signal-lab.html',
+            pathValue: 'tools/index.html',
             settings: settings.DEFAULT_SITE_SETTINGS,
             isAdmin: false
         });
-        if (trackable >= 8 && access.allowed) {
-            pass('Shared Node modules', `${trackable} trackable pages, signal-lab allowed`);
+        const signalLab = pages.PUBLIC_PAGES.find((p) => p.key === 'okamiSignalLab');
+        const ledCalc = pages.PUBLIC_PAGES.find((p) => p.key === 'ledVideoWallCalculator');
+        const signalExternal = Boolean(signalLab?.external || pages.isAbsoluteUrl?.(signalLab?.publicPath));
+        const ledExternal = Boolean(ledCalc?.external || pages.isAbsoluteUrl?.(ledCalc?.publicPath));
+        if (trackable >= 6 && access.allowed && signalExternal && ledExternal) {
+            pass('Shared Node modules', `${trackable} trackable pages, tools hub allowed, tools external`);
         } else {
-            fail('Shared Node modules', `trackable=${trackable} allowed=${access.allowed}`);
+            fail('Shared Node modules', `trackable=${trackable} allowed=${access.allowed} signalExternal=${signalExternal} ledExternal=${ledExternal}`);
         }
     } catch (error) {
         fail('Shared Node modules', error.message);
@@ -137,7 +141,8 @@ function testHtmlBootstrap(file, relPrefix, options = {}) {
 function testSignalLabCalcShim() {
     const label = 'Signal Lab LED calc shim loads shared metrics';
     try {
-        const calcDir = path.join(root, 'tools', 'led-wall-calculator');
+        const calcDir = path.join(root, '..', 'okami-led-wall-calculator', 'engine');
+        const signalLabShim = path.join(root, '..', 'okami-signal-lab', 'engine', 'led-wall-calculator.js');
         const ctx = {
             OkamiLedWallCalculator: {},
             OkamiSignalLab: {},
@@ -149,10 +154,7 @@ function testSignalLabCalcShim() {
         for (const file of ['constants.js', 'calculations.js', 'metrics.js']) {
             vm.runInNewContext(fs.readFileSync(path.join(calcDir, file), 'utf8'), ctx);
         }
-        vm.runInNewContext(
-            fs.readFileSync(path.join(root, 'tools/signal-lab/engine/led-wall-calculator.js'), 'utf8'),
-            ctx
-        );
+        vm.runInNewContext(fs.readFileSync(signalLabShim, 'utf8'), ctx);
         const r = ctx.OkamiSignalLab.LedWallCalculator.calculateLedWall({
             panelWidthPx: 192,
             panelHeightPx: 192,
@@ -195,15 +197,11 @@ testServerRequires();
 testSignalLabCalcShim();
 testCommercialFlagsDisabled();
 testHtmlBootstrap('home.html', '');
-testHtmlBootstrap('tools/signal-lab.html', '../');
-testHtmlBootstrap('tools/led-wall-visualizer.html', '../');
 testHtmlBootstrap('admin.html', '', { requireVisibility: false });
 
 const pages = [
     '/home.html',
     '/tools/index.html',
-    '/tools/signal-lab.html',
-    '/tools/led-wall-visualizer.html',
     '/api/health',
     '/api/site-settings',
     '/api/commercial/config',
@@ -214,13 +212,49 @@ for (const p of pages) {
     await fetchOk(`${BASE}${p}`, `HTTP ${p}`);
 }
 
-const signalHtml = await (await fetch(`${BASE}/tools/signal-lab.html`).catch(() => null))?.text();
-if (signalHtml) {
-    if (signalHtml.includes('signal-lab-controls-scroll') && signalHtml.includes('signal-lab-app')) {
-        pass('Signal Lab layout markup', 'controls-scroll + app present');
-    } else {
-        fail('Signal Lab layout markup', 'missing controls-scroll or app');
+async function expectRedirect(path, hostFragment, label) {
+    try {
+        const redirectRes = await fetch(`${BASE}${path}`, { redirect: 'manual' });
+        const location = redirectRes.headers.get('location') || '';
+        if ([301, 302, 307, 308].includes(redirectRes.status) && location.includes(hostFragment)) {
+            pass(label, `${redirectRes.status} → ${location}`);
+        } else {
+            fail(label, `status=${redirectRes.status} location=${location}`);
+        }
+    } catch (error) {
+        fail(label, error.message);
     }
+}
+
+await expectRedirect('/tools/signal-lab', 'signallab.okamidesigns.com', 'Signal Lab legacy redirect');
+await expectRedirect('/tools/led-video-wall-calculator', 'ledcalc.okamidesigns.com', 'LED calculator legacy redirect');
+
+const signalLabLanding = path.join(root, '..', 'okami-signal-lab', 'index.html');
+const signalLabApp = path.join(root, '..', 'okami-signal-lab', 'app.html');
+if (fs.existsSync(signalLabLanding) && fs.existsSync(signalLabApp)) {
+    const landingHtml = fs.readFileSync(signalLabLanding, 'utf8');
+    const signalHtml = fs.readFileSync(signalLabApp, 'utf8');
+    if (landingHtml.includes('Open Signal Lab') && signalHtml.includes('signal-lab-app') && signalHtml.includes('signal-lab-control-deck')) {
+        pass('Standalone Signal Lab layout markup', 'landing + app + control-deck present');
+    } else {
+        fail('Standalone Signal Lab layout markup', 'missing landing CTA, app, or control-deck');
+    }
+} else {
+    fail('Standalone Signal Lab layout markup', `missing ${signalLabLanding} or ${signalLabApp}`);
+}
+
+const ledLanding = path.join(root, '..', 'okami-led-wall-calculator', 'index.html');
+const ledApp = path.join(root, '..', 'okami-led-wall-calculator', 'app.html');
+if (fs.existsSync(ledLanding) && fs.existsSync(ledApp)) {
+    const landingHtml = fs.readFileSync(ledLanding, 'utf8');
+    const ledHtml = fs.readFileSync(ledApp, 'utf8');
+    if (landingHtml.includes('Open Calculator') && ledHtml.includes('led-wall-app') && ledHtml.includes('app.js')) {
+        pass('Standalone LED calculator layout markup', 'landing + app shell present');
+    } else {
+        fail('Standalone LED calculator layout markup', 'missing landing CTA or app shell');
+    }
+} else {
+    fail('Standalone LED calculator layout markup', `missing ${ledLanding} or ${ledApp}`);
 }
 
 const failed = results.filter((r) => !r.ok);

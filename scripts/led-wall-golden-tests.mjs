@@ -1,5 +1,5 @@
 /**
- * Golden tests for tools/led-wall-calculator/ (Node, no DOM).
+ * Golden tests for ../okami-led-wall-calculator/engine/ (Node, no DOM).
  * Run: node scripts/led-wall-golden-tests.mjs
  */
 import fs from 'fs';
@@ -8,7 +8,7 @@ import vm from 'vm';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const calcDir = path.join(__dirname, '..', 'tools', 'led-wall-calculator');
+const calcDir = path.join(__dirname, '..', '..', 'okami-led-wall-calculator', 'engine');
 
 function loadCalculator() {
     const ctx = { OkamiLedWallCalculator: {} };
@@ -502,7 +502,7 @@ const cases = [
         name: 'build sheet port mapping — 4 ports @ 90% fill',
         fn: () => {
             const ctx = { OkamiLedWallCalculator: {} };
-            const calcDir = path.join(__dirname, '..', 'tools', 'led-wall-calculator');
+            const calcDir = path.join(__dirname, '..', '..', 'okami-led-wall-calculator', 'engine');
             for (const file of ['constants.js', 'calculations.js', 'build-sheet-export.js']) {
                 vm.runInNewContext(fs.readFileSync(path.join(calcDir, file), 'utf8'), ctx);
             }

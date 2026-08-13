@@ -2,6 +2,8 @@
 
 Public pages must load shared modules **before** `site-visibility.js`. Use explicit `<script>` tags (not dynamic injection).
 
+`site-layout.js` (after the registry) fills the Tools nav dropdown from `OkamiPageRegistry.getToolPages()`. Keep only the static **All Tools** hub link in HTML — see [ADDING-A-TOOL.md](ADDING-A-TOOL.md).
+
 ## Site root pages
 
 `home.html`, `services.html`, `support.html`, `contact.html`, `index.html`, `page-template.html`, `admin.html`:
@@ -27,9 +29,9 @@ Admin pages omit visibility/analytics/site-layout unless needed:
 <!-- admin scripts -->
 ```
 
-## Tool pages
+## Tool pages (in-site shells only)
 
-`tools/*.html` — same block with `../` prefix:
+First-party apps (Signal Lab, LED Calculator) are **standalone sibling repos** and do not use this bootstrap. For any remaining in-site tool shells under `tools/*.html`, use the same block with a `../` prefix:
 
 ```html
 <script src="../shared/settings/site-settings.js"></script>
@@ -41,19 +43,9 @@ Admin pages omit visibility/analytics/site-layout unless needed:
 <script src="../site-layout.js"></script>
 <script src="../script.js"></script>
 <!-- tool-specific scripts below -->
-<script src="led-wall-calculator/constants.js"></script>
-<script src="led-wall-calculator/calculations.js"></script>
-<script src="led-wall-calculator/metrics.js"></script>
 ```
 
-Signal Lab additionally loads the adapter shim after shared calculator scripts:
-
-```html
-<script src="../led-wall-calculator/constants.js"></script>
-<script src="../led-wall-calculator/calculations.js"></script>
-<script src="../led-wall-calculator/metrics.js"></script>
-<script src="signal-lab/engine/led-wall-calculator.js"></script>
-```
+Standalone apps copy chrome from sibling `okami-app-template/` instead.
 
 ## Commercial client (Phase 4+ only)
 

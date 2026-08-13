@@ -22,10 +22,10 @@ node scripts/phase-0-acceptance.mjs http://localhost:3001
 
 | Check | URL / action | Expected |
 |-------|----------------|----------|
-| Signal Lab loads | `/tools/signal-lab.html` | Calibration pattern visible; status shows ready |
+| Signal Lab loads | sibling `okami-signal-lab` / `https://signallab.okamidesigns.com/` | Calibration pattern visible; status shows ready |
 | Controls live | Change pattern / slider | Preview updates |
 | Sidebar scroll | Scroll controls panel | All buttons reachable at bottom |
-| LED calculator | `/tools/led-wall-visualizer.html` | Summary updates after chip selection |
+| LED calculator | sibling `okami-led-wall-calculator` / `https://ledcalc.okamidesigns.com/` | Summary updates after chip selection |
 | SPA nav | Home → Tools → Signal Lab via nav | Page loads without full reload errors |
 | Commercial off | Browser console | No blocking errors from `/api/commercial/*` |
 

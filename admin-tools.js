@@ -241,6 +241,7 @@
                         <p><span>URL</span> ${escapeHtml(tool.url || '—')}</p>
                         <p><span>Type</span> ${escapeHtml(tool.contentType || 'tool')}</p>
                         <p><span>Image</span> ${escapeHtml(tool.imageSource || 'upload')}</p>
+                        <p><span>Nav</span> ${tool.navGroup === 'apps' ? 'Apps group' : tool.navGroup === 'avTools' ? 'AV Tools group' : 'Not in dropdown'}</p>
                         ${tool.listOnToolsPage === false ? '<p><span>Listing</span> Hidden from Tools page</p>' : ''}
                     </div>
                 </div>
@@ -509,6 +510,15 @@
                 <label><input type="checkbox" id="tool-field-list-tools"${tool.listOnToolsPage !== false ? ' checked' : ''}> List on Tools page</label>
             </div>
             <div class="modal-field">
+                <label for="tool-field-nav-group">Tools nav dropdown group</label>
+                <select id="tool-field-nav-group">
+                    <option value=""${!tool.navGroup ? ' selected' : ''}>Not shown in nav dropdown</option>
+                    <option value="apps"${tool.navGroup === 'apps' ? ' selected' : ''}>Apps</option>
+                    <option value="avTools"${tool.navGroup === 'avTools' ? ' selected' : ''}>AV Tools</option>
+                </select>
+                <p class="modal-hint">Controls which group (if any) this shows under in the header TOOLS dropdown.</p>
+            </div>
+            <div class="modal-field">
                 <label for="tool-field-slug">Slug (for detail page)</label>
                 <input id="tool-field-slug" type="text" maxlength="120" value="${escapeHtml(tool.slug || '')}">
             </div>
@@ -594,6 +604,7 @@
             enabled: form.querySelector('#tool-field-enabled').checked,
             featured: form.querySelector('#tool-field-featured').checked,
             listOnToolsPage: form.querySelector('#tool-field-list-tools').checked,
+            navGroup: form.querySelector('#tool-field-nav-group').value || null,
             contentType: form.querySelector('#tool-field-content-type').value,
             slug: slugify(form.querySelector('#tool-field-slug').value || title),
             detailPageEnabled: form.querySelector('#tool-field-detail').checked,
@@ -713,6 +724,7 @@
             openInNewTab: false,
             enabled: true,
             featured: false,
+            navGroup: null,
             slug: '',
             detailPageEnabled: false,
             accent: 'default',
@@ -924,6 +936,73 @@
         openToolEditor(copy);
     }
 
+    function sanitizeSubdomain(value) {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    function quickAddApp(event) {
+        event.preventDefault();
+
+        const titleInput = document.getElementById('quickadd-app-title');
+        const subdomainInput = document.getElementById('quickadd-app-subdomain');
+        const descInput = document.getElementById('quickadd-app-desc');
+        const featuredInput = document.getElementById('quickadd-app-featured');
+        if (!titleInput || !subdomainInput) {
+            return;
+        }
+
+        const title = titleInput.value.trim();
+        const subdomain = sanitizeSubdomain(subdomainInput.value);
+
+        if (!title || !subdomain) {
+            ui().showToast?.('App name and subdomain are required.', 'error');
+            return;
+        }
+
+        const id = slugify(subdomain) || slugify(title);
+        if (toolsState.some((tool) => tool.id === id || tool.slug === id)) {
+            ui().showToast?.(`An app with the subdomain "${subdomain}" already exists.`, 'error');
+            return;
+        }
+
+        const nowIso = new Date().toISOString();
+        const api = catalogApi();
+        const raw = {
+            id,
+            title,
+            category: 'Apps',
+            shortDescription: descInput?.value.trim() || '',
+            contentType: 'app',
+            buttonLabel: `Open ${title}`,
+            url: `https://${subdomain}.okamidesigns.com`,
+            linkType: 'external',
+            enabled: true,
+            featured: featuredInput ? featuredInput.checked : true,
+            listOnToolsPage: true,
+            slug: id,
+            navGroup: 'apps',
+            imageSource: 'placeholder',
+            createdAt: nowIso,
+            updatedAt: nowIso
+        };
+        const tool = api?.normalizeTool
+            ? api.normalizeTool(raw, toolsState.length, nowIso)
+            : { ...raw, displayOrder: toolsState.length + 1, homepageOrder: raw.featured ? toolsState.length + 1 : 999 };
+
+        toolsState.push(tool);
+        sortState();
+        markDirty();
+        renderToolsList();
+
+        event.target.reset();
+        titleInput.focus();
+        ui().showToast?.(`${title} added. Save Changes to publish.`, 'success');
+    }
+
     function moveFeatured(toolId, direction) {
         const featured = toolsState
             .filter((tool) => tool.featured)
@@ -1054,6 +1133,7 @@
         toolsBound = true;
 
         document.getElementById('add-tool-btn')?.addEventListener('click', () => openToolEditor(null));
+        document.getElementById('quickadd-app-form')?.addEventListener('submit', quickAddApp);
         document.getElementById('save-tools-catalog')?.addEventListener('click', saveToolsCatalog);
         document.getElementById('reload-tools-catalog')?.addEventListener('click', () => loadToolsCatalog({ force: false }));
         document.getElementById('save-featured-catalog')?.addEventListener('click', saveToolsCatalog);

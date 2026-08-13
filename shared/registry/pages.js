@@ -61,22 +61,26 @@
         {
             key: 'ledVideoWallCalculator',
             title: 'LED Video Wall Calculator',
-            filePaths: ['tools/led-wall-visualizer.html'],
-            publicPath: '/tools/led-video-wall-calculator',
-            analyticsPath: '/tools/led-video-wall-calculator',
-            canonicalPath: '/tools/led-video-wall-calculator',
-            trackAnalytics: true,
-            productId: 'okami-led-wall-calculator'
+            // Standalone app: ../okami-led-wall-calculator (Docker / ledcalc subdomain)
+            filePaths: [],
+            publicPath: 'https://ledcalc.okamidesigns.com/',
+            analyticsPath: 'https://ledcalc.okamidesigns.com/',
+            canonicalPath: 'https://ledcalc.okamidesigns.com/',
+            trackAnalytics: false,
+            productId: 'okami-led-wall-calculator',
+            external: true
         },
         {
             key: 'okamiSignalLab',
             title: 'Okami Signal Lab',
-            filePaths: ['tools/signal-lab.html'],
-            publicPath: '/tools/signal-lab',
-            analyticsPath: '/tools/signal-lab',
-            canonicalPath: '/tools/signal-lab',
-            trackAnalytics: true,
-            productId: 'okami-signal-lab'
+            // Standalone app: /Users/.../okami-signal-lab (Docker / signallab subdomain)
+            filePaths: [],
+            publicPath: 'https://signallab.okamidesigns.com/',
+            analyticsPath: 'https://signallab.okamidesigns.com/',
+            canonicalPath: 'https://signallab.okamidesigns.com/',
+            trackAnalytics: false,
+            productId: 'okami-signal-lab',
+            external: true
         }
     ];
 
@@ -120,8 +124,11 @@
         '/contact.html': '/contact',
         '/tools.html': '/tools',
         '/tools/index.html': '/tools',
-        '/tools/led-wall-visualizer.html': '/tools/led-video-wall-calculator',
-        '/tools/signal-lab.html': '/tools/signal-lab',
+        '/tools/led-video-wall-calculator': 'https://ledcalc.okamidesigns.com/',
+        '/tools/led-wall-visualizer.html': 'https://ledcalc.okamidesigns.com/',
+        '/tools/signal-lab': 'https://signallab.okamidesigns.com/',
+        '/tools/signal-lab.html': 'https://signallab.okamidesigns.com/',
+        '/tools/signal-lab-output.html': 'https://signallab.okamidesigns.com/signal-lab-output.html',
         '/3d-prints.html': '/3d-prints'
     };
 
@@ -143,6 +150,10 @@
         '404.html',
         '50x.html'
     ]);
+
+    function isAbsoluteUrl(value) {
+        return typeof value === 'string' && /^https?:\/\//i.test(value);
+    }
 
     function normalizeRequestPathname(pathname) {
         let normalized = (pathname || '/').split('?')[0].replace(/\\/g, '/').toLowerCase();
@@ -396,12 +407,15 @@
             return null;
         }
 
+        const url = page.publicPath || '/';
+        const external = Boolean(page.external) || isAbsoluteUrl(url);
+
         return {
             key: page.key,
             title: page.title,
             navLabel: page.navLabel || page.title.toUpperCase(),
-            url: page.publicPath || '/',
-            external: false,
+            url,
+            external,
             inTopNav: TOP_NAV_ITEM_KEYS.includes(page.key),
             isToolsDropdown: page.key === 'tools',
             isContactBtn: page.key === 'contact',
@@ -435,13 +449,24 @@
 
     function getPublicServeRoutes() {
         const routes = PUBLIC_PAGES
-            .filter((page) => page.publicPath && page.publicPath !== '/')
+            .filter((page) => {
+                if (!page.publicPath || page.publicPath === '/') {
+                    return false;
+                }
+                if (isAbsoluteUrl(page.publicPath) || page.external) {
+                    return false;
+                }
+                return Boolean(page.filePaths && page.filePaths[0]);
+            })
             .map((page) => ({
                 publicPath: page.publicPath,
                 filePath: page.filePaths[0]
             }));
 
         EXTRA_PUBLIC_ROUTES.forEach((route) => {
+            if (isAbsoluteUrl(route.publicPath)) {
+                return;
+            }
             routes.push({
                 publicPath: route.publicPath,
                 filePath: route.filePath
@@ -485,6 +510,7 @@
         SPLASH_PAGE,
         TOOL_PAGE_KEYS,
         EXEMPT_PATHS,
+        isAbsoluteUrl,
         normalizeFilePath,
         normalizeRequestPathname,
         normalizeAnalyticsPath,

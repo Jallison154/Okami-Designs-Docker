@@ -59,11 +59,9 @@ flowchart TB
 
 | Path | Role |
 |------|------|
-| `tools/signal-lab/app.js` | Signal Lab UI only — DOM, controls, preview wiring |
-| `tools/signal-lab/engine/` | Portable render/canvas/math (usable in desktop shell) |
-| `tools/signal-lab/modules/` | Pattern modules (pure logic + minimal UI hooks) |
-| `tools/led-wall-calculator/` | LED wall math (shared calculations) |
-| `tools/led-wall-visualizer.js` | LED calculator browser UI |
+| Sibling `okami-signal-lab/` | Standalone Signal Lab app (static Docker) |
+| Sibling `okami-led-wall-calculator/` | Standalone LED calculator app (static Docker) |
+| Sibling `okami-app-template/` | Shared design tokens + header/footer chrome |
 | `shared/` | Cross-platform modules (Node + browser via IIFE / `require`) |
 | `client/commercial/` | Browser stubs — fetch API, legal footer, upgrade placeholders (**off by default**) |
 | `server/commercial/` | Licensing, accounts, entitlements, version checks |
@@ -117,7 +115,7 @@ SPA navigation (`script.js`) skips re-loading bootstrap and shared scripts on cl
 
 ## Signal Lab
 
-See `tools/signal-lab/ARCHITECTURE.md` for tool-specific UI vs engine boundaries.
+See sibling `okami-signal-lab/ARCHITECTURE.md` for tool-specific UI vs engine boundaries.
 
 ## Legal pages
 

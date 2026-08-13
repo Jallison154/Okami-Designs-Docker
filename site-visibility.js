@@ -28,11 +28,6 @@
         okamiSignalLab: ['tools/signal-lab.html']
     };
 
-    const TOOL_PAGE_KEYS = registryApi?.TOOL_PAGE_KEYS || [
-        'ledVideoWallCalculator',
-        'okamiSignalLab'
-    ];
-
     const SYSTEM_PAGES = visibilityApi?.SYSTEM_PAGES || new Set(['404.html', '50x.html']);
     const ADMIN_LOGIN_PAGE = visibilityApi?.ADMIN_LOGIN_PAGE || 'admin.html';
     const ADMIN_ANALYTICS_PAGE = visibilityApi?.ADMIN_ANALYTICS_PAGE || 'admin-analytics.html';
@@ -711,8 +706,7 @@
             return null;
         }
 
-        const anyToolVisible = TOOL_PAGE_KEYS.some((key) => isPageVisible(settings, key));
-        if (!isPageVisible(settings, 'tools') || !anyToolVisible) {
+        if (!isPageVisible(settings, 'tools')) {
             return null;
         }
 
@@ -728,18 +722,11 @@
             }
         });
 
-        const sortedToolKeys = getSortedNavKeys(settings, TOOL_PAGE_KEYS);
-        sortedToolKeys.forEach((key) => {
-            const link = menu.querySelector(`[data-tool-key="${key}"]`);
-            if (!link) {
-                return;
-            }
-            if (!isPageVisible(settings, key)) {
-                link.remove();
-                return;
-            }
-            menu.appendChild(link);
-        });
+        // Catalog-driven Apps / AV Tools groups (site-layout.js). Async — resolves once
+        // the tools catalog loads. Safe on every nav rebuild: it clears its own nodes first.
+        if (typeof window.OkamiSiteLayout?.ensureToolsMenuLinks === 'function') {
+            window.OkamiSiteLayout.ensureToolsMenuLinks(menu, { isMobile });
+        }
 
         return node;
     }

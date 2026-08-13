@@ -21,10 +21,11 @@ Keep business logic in the right layer. This prevents licensing secrets from lea
 
 ## Adding a tool
 
-1. Put portable logic in `engine/` or `led-wall-calculator/`-style modules.
-2. Keep UI in `app.js` or `*-visualizer.js`.
-3. Register the tool page in `shared/registry/pages.js` with a `productId` when commercial metadata applies.
-4. Use `full-height-tool` on `main` for full-viewport tool layouts.
+Follow the full recipe in [ADDING-A-TOOL.md](ADDING-A-TOOL.md).
+
+**Preferred for new first-party tools:** create a sibling standalone app from `okami-app-template/` (static nginx Docker if client-only), then register an **absolute** `publicPath` + `external: true` in `shared/registry/pages.js` with legacy redirects from any old `/tools/...` paths.
+
+In-site tool pages are only for lightweight hub/detail shells — not full product UIs.
 
 ## Commercial / licensing
 

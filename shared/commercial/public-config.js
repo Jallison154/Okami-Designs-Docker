@@ -6,14 +6,14 @@
         'okami-signal-lab': {
             id: 'okami-signal-lab',
             name: 'Okami Signal Lab',
-            webPath: '/tools/signal-lab',
+            webPath: 'https://signallab.okamidesigns.com/',
             desktopSku: 'okami-signal-lab-desktop',
             tier: 'professional'
         },
         'okami-led-wall-calculator': {
             id: 'okami-led-wall-calculator',
             name: 'LED Video Wall Calculator',
-            webPath: '/tools/led-video-wall-calculator',
+            webPath: 'https://ledcalc.okamidesigns.com/',
             desktopSku: 'okami-led-wall-calculator-desktop',
             tier: 'standard'
         }
