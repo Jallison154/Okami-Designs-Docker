@@ -13,11 +13,20 @@ services:
     working_dir: /app
     command: npm start
     restart: unless-stopped
+    # Optional: for local/CLI deploys with a real .env file (cp .env.example .env).
+    # Skipped harmlessly when absent (e.g. Portainer Git-stack deploys), which is
+    # why the vars that matter are also listed explicitly below via ${...}
+    # substitution — Portainer's stack "Environment variables" feed those directly.
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - PORT=${PORT:-3000}
+      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH:-}
+      - ADMIN_SESSION_SECRET=${ADMIN_SESSION_SECRET:-}
+      - ADMIN_SESSION_MAX_AGE_MS=${ADMIN_SESSION_MAX_AGE_MS:-1800000}
+      - OKAMI_CORS_ALLOWED_ORIGINS=${OKAMI_CORS_ALLOWED_ORIGINS:-}
     networks:
       - okami-designs-network
 
