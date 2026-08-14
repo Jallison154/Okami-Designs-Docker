@@ -25,6 +25,7 @@ bcrypt.hash(password, 12, (error, hash) => {
     }
 
     const sessionSecret = crypto.randomBytes(32).toString('hex');
+    const hashBase64 = Buffer.from(hash, 'utf8').toString('base64');
 
     console.log('');
     console.log('Add these lines to .env in the project root (see docs/ADMIN-LOGIN-SETUP.md):');
@@ -33,6 +34,12 @@ console.log(`ADMIN_PASSWORD_HASH='${hash}'`);
 console.log(`ADMIN_SESSION_SECRET=${sessionSecret}`);
 console.log('');
 console.log('Use single quotes around ADMIN_PASSWORD_HASH — bcrypt hashes contain $ characters.');
+    console.log('');
+    console.log('Deploying through a UI that mangles $ in plain env vars (e.g. Portainer stack');
+    console.log('environment variables)? Use this instead of ADMIN_PASSWORD_HASH — no quoting needed:');
+    console.log('');
+    console.log(`ADMIN_PASSWORD_HASH_BASE64=${hashBase64}`);
+    console.log('');
     console.log('Then restart the server: npm start');
     console.log('Sign in at /admin.html with the plain password you used above — not the hash.');
     console.log('');

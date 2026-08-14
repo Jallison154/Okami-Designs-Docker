@@ -12,9 +12,28 @@ function looksLikeBcryptHash(value) {
     return typeof value === 'string' && /^\$2[aby]\$\d{2}\$.{53}$/.test(value);
 }
 
+function decodeBase64Env(value) {
+    if (!value) {
+        return '';
+    }
+    try {
+        return Buffer.from(value.trim(), 'base64').toString('utf8').trim();
+    } catch {
+        return '';
+    }
+}
+
 function readAdminAuthConfig(appConfig = {}) {
     const isProduction = appConfig.isProduction ?? process.env.NODE_ENV === 'production';
     let passwordHash = (process.env.ADMIN_PASSWORD_HASH || '').trim();
+
+    // Fallback for deploy pipelines that mangle literal $ characters in plain env
+    // vars (e.g. shell-expanding $IDENTIFIER-shaped runs inside a bcrypt hash).
+    // Base64 has no $, so it survives any such pass-through untouched.
+    if (!passwordHash) {
+        passwordHash = decodeBase64Env(process.env.ADMIN_PASSWORD_HASH_BASE64);
+    }
+
     let sessionSecret = (
         process.env.ADMIN_SESSION_SECRET
         || process.env.OKAMI_SESSION_SECRET
@@ -56,7 +75,8 @@ function getAdminAuthDiagnostics(config) {
         missing.push('ADMIN_PASSWORD_HASH');
     } else if (!looksLikeBcryptHash(resolved.passwordHash)) {
         warnings.push(
-            'ADMIN_PASSWORD_HASH looks corrupted — wrap the hash in single quotes in .env (bcrypt contains $)'
+            'ADMIN_PASSWORD_HASH looks corrupted — either wrap it in single quotes in .env (bcrypt contains $), '
+            + 'or set ADMIN_PASSWORD_HASH_BASE64 instead if your deploy pipeline mangles $ in plain env vars'
         );
         missing.push('ADMIN_PASSWORD_HASH');
     }

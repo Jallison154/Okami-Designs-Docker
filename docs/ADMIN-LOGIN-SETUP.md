@@ -11,6 +11,20 @@ The admin panel (`/admin.html`) authenticates through the Node API. The server *
 
 Optional: `ADMIN_SESSION_MAX_AGE_MS` (default `1800000` = 30 minutes).
 
+### Deploying through a UI that mangles `$`?
+
+Some deploy pipelines — notably Portainer's stack "Environment variables" panel in
+some configurations — run values through shell variable expansion before they
+reach the container, silently stripping any `$IDENTIFIER`-shaped run out of a
+bcrypt hash (bcrypt hashes are full of literal `$` characters). If
+`/api/admin/setup-status` reports `ADMIN_PASSWORD_HASH looks corrupted` even
+after carefully re-pasting the value, this is almost certainly why.
+
+Fix: set `ADMIN_PASSWORD_HASH_BASE64` instead of `ADMIN_PASSWORD_HASH`. Base64
+output contains no `$`, so it passes through unharmed regardless of the
+pipeline. The generator script below prints this value for you — just paste it
+into your deploy UI's environment variable field as-is.
+
 ## 1. Generate a password hash
 
 From the project root:
